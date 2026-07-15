@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +10,10 @@
     <div class="app-container">
         <header>
             <h1>MyNote</h1>
-            <button id="addNoteBtn" class="btn primary">새 노트 작성</button>
+            <div class="header-actions">
+                <button id="themeToggleBtn" class="btn">🌙 다크 모드</button>
+                <button id="addNoteBtn" class="btn primary">새 노트 작성</button>
+            </div>
         </header>
         <main>
             <div id="noteEditor" class="hidden">
@@ -25,6 +28,19 @@
                 <!-- 노트 목록이 여기에 렌더링됩니다 -->
             </div>
         </main>
+    </div>
+
+    <!-- 긴 노트 보기를 위한 모달 -->
+    <div id="viewModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-btn" id="closeModalBtn">&times;</span>
+            <h2 id="modalTitle"></h2>
+            <div id="modalContent" class="modal-body"></div>
+            <div class="modal-footer">
+                <span id="modalDate"></span>
+                <button id="editFromModalBtn" class="btn primary">수정</button>
+            </div>
+        </div>
     </div>
     <script src="app.js"></script>
 </body>
