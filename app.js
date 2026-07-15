@@ -288,7 +288,32 @@ document.addEventListener('DOMContentLoaded', () => {
         if(aiOpinionBtn) aiOpinionBtn.disabled = true;
 
         try {
-            const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" + apiKey, {
+            // 1. 사용자 API 키로 접근 가능한 모델 목록 자동 탐색
+            let targetModel = "models/gemini-1.5-flash"; // 기본 fallback
+            try {
+                const listRes = await fetch("https://generativelanguage.googleapis.com/v1beta/models?key=" + apiKey);
+                if (listRes.ok) {
+                    const listData = await listRes.json();
+                    if (listData && listData.models) {
+                        // generateContent를 지원하는 gemini 계열 모델 찾기 (가장 최신/가벼운 flash 우선)
+                        const validModels = listData.models.filter(m => 
+                            m.supportedGenerationMethods && 
+                            m.supportedGenerationMethods.includes("generateContent") && 
+                            m.name.includes("gemini")
+                        );
+                        if (validModels.length > 0) {
+                            // flash가 들어간 모델 우선 선택, 없으면 첫 번째 유효 모델
+                            const flashModel = validModels.find(m => m.name.includes("flash"));
+                            targetModel = flashModel ? flashModel.name : validModels[0].name;
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn("모델 자동 탐색 실패, 기본 모델로 시도합니다.", e);
+            }
+
+            // 2. 동적으로 찾은 모델로 요청 전송
+            const response = await fetch("https://generativelanguage.googleapis.com/v1beta/" + targetModel + ":generateContent?key=" + apiKey, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
