@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>나만의 노트 (MyNote)</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>MyNote</h1>
+            <button id="addNoteBtn" class="btn primary">새 노트 작성</button>
+        </header>
+        <main>
+            <div id="noteEditor" class="hidden">
+                <input type="text" id="noteTitle" placeholder="노트 제목">
+                <textarea id="noteContent" placeholder="내용을 입력하세요..."></textarea>
+                <div class="editor-actions">
+                    <button id="saveNoteBtn" class="btn success">저장</button>
+                    <button id="cancelNoteBtn" class="btn">취소</button>
+                </div>
+            </div>
+            <div id="notesContainer" class="notes-grid">
+                <!-- 노트 목록이 여기에 렌더링됩니다 -->
+            </div>
+        </main>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
