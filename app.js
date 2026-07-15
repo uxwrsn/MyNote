@@ -40,7 +40,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (stored) {
             const parsed = JSON.parse(stored);
             if (Array.isArray(parsed)) {
-                // 유효하지 않은 데이터(null, undefined 등) 필터링
                 notes = parsed.filter(n => n !== null && typeof n === 'object');
             }
         }
@@ -59,11 +58,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.setAttribute('data-theme', savedTheme);
         if(themeToggleBtn) themeToggleBtn.textContent = savedTheme === 'light' ? '🌙' : '☀️';
         if(apiKeyInput) apiKeyInput.value = localStorage.getItem('mynote-gemini-key') || '';
-    } catch(e) {
-        console.error("테마/설정 로드 실패:", e);
-    }
+    } catch(e) {}
 
-    // 4. 이벤트 리스너 등록 (렌더링 에러가 발생해도 버튼은 작동하도록 위로 배치)
+    // 4. 이벤트 리스너 등록
     if(themeToggleBtn) {
         themeToggleBtn.addEventListener('click', () => {
             const currentTheme = document.documentElement.getAttribute('data-theme');
@@ -165,11 +162,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // AI Buttons
     if(aiSummarizeBtn) {
         aiSummarizeBtn.addEventListener('click', () => {
             if (!currentViewingNote) return;
-            const prompt = \`다음 노트의 내용을 핵심만 3~4줄로 간결하게 요약해줘:\\n\\n제목: \${currentViewingNote.title}\\n내용: \${currentViewingNote.content}\`;
+            const prompt = "다음 노트의 내용을 핵심만 3~4줄로 간결하게 요약해줘:\\n\\n제목: " + currentViewingNote.title + "\\n내용: " + currentViewingNote.content;
             fetchAI(prompt);
         });
     }
@@ -177,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if(aiOpinionBtn) {
         aiOpinionBtn.addEventListener('click', () => {
             if (!currentViewingNote) return;
-            const prompt = \`다음 노트의 내용을 읽고, 건설적인 피드백이나 새로운 아이디어, 또는 관련된 통찰을 제공해줘:\\n\\n제목: \${currentViewingNote.title}\\n내용: \${currentViewingNote.content}\`;
+            const prompt = "다음 노트의 내용을 읽고, 건설적인 피드백이나 새로운 아이디어, 또는 관련된 통찰을 제공해줘:\\n\\n제목: " + currentViewingNote.title + "\\n내용: " + currentViewingNote.content;
             fetchAI(prompt);
         });
     }
@@ -204,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(emptyState) {
                     emptyState.classList.remove('hidden');
                     if (notes.length === 0) emptyState.textContent = '아직 작성된 노트가 없습니다.';
-                    else emptyState.textContent = \`'\${currentSearchTerm}'에 대한 검색 결과가 없습니다.\`;
+                    else emptyState.textContent = "'" + currentSearchTerm + "'에 대한 검색 결과가 없습니다.";
                 }
             } else {
                 if(emptyState) emptyState.classList.add('hidden');
@@ -216,20 +212,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     const titleStr = typeof note.title === 'string' ? note.title : '제목 없음';
                     const contentStr = typeof note.content === 'string' ? note.content : '';
                     
-                    card.innerHTML = \`
-                        <h3>\${escapeHtml(titleStr)}</h3>
-                        <p>\${escapeHtml(contentStr)}</p>
-                        <div class="note-card-footer">
-                            <span>\${dateStr}</span>
-                            <button class="btn danger" onclick="deleteNote(event, '\${note.id}')">삭제</button>
-                        </div>
-                    \`;
+                    let htmlContent = "<h3>" + escapeHtml(titleStr) + "</h3>";
+                    htmlContent += "<p>" + escapeHtml(contentStr) + "</p>";
+                    htmlContent += "<div class='note-card-footer'>";
+                    htmlContent += "<span>" + dateStr + "</span>";
+                    htmlContent += "<button class='btn danger' onclick='deleteNote(event, \"" + note.id + "\")'>삭제</button>";
+                    htmlContent += "</div>";
+                    
+                    card.innerHTML = htmlContent;
                     card.addEventListener('click', () => viewNote(note));
                     notesContainer.appendChild(card);
                 });
             }
         } catch (e) {
-            console.error("렌더링 중 에러 발생:", e);
+            console.error("렌더링 에러:", e);
         }
     }
 
@@ -292,7 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if(aiOpinionBtn) aiOpinionBtn.disabled = true;
 
         try {
-            const response = await fetch(\`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=\${apiKey}\`, {
+            const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -309,12 +305,12 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if(aiResponseContent) {
                 aiResponseContent.innerHTML = escapeHtml(text)
-                    .replace(/\\*\\*(.*?)\\*\\*/g, '<strong>$1</strong>')
-                    .replace(/\\n/g, '<br>');
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\n/g, '<br>');
             }
         } catch (error) {
             if(aiResponseContent) {
-                aiResponseContent.innerHTML = \`<span style="color:var(--danger-color)">에러 발생: \${error.message}</span>\`;
+                aiResponseContent.innerHTML = "<span style='color:var(--danger-color)'>에러 발생: " + error.message + "</span>";
             }
         } finally {
             if(aiSummarizeBtn) aiSummarizeBtn.disabled = false;
@@ -332,6 +328,5 @@ document.addEventListener('DOMContentLoaded', () => {
              .replace(/'/g, "&#039;");
     }
 
-    // 6. 초기 렌더링 실행 (이벤트 리스너 등록 후 가장 마지막에 실행)
     renderNotes();
 });
