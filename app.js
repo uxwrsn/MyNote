@@ -297,7 +297,9 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (!response.ok) {
-                throw new Error('API 요청에 실패했습니다. 키가 올바른지 확인해주세요.');
+                const errorData = await response.json().catch(() => ({}));
+                const detailedMsg = (errorData && errorData.error && errorData.error.message) ? errorData.error.message : response.statusText;
+                throw new Error('API 오류 (' + response.status + '): ' + detailedMsg);
             }
 
             const data = await response.json();
