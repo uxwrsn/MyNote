@@ -11,7 +11,9 @@
         <header>
             <h1>MyNote</h1>
             <div class="header-actions">
-                <button id="themeToggleBtn" class="btn">🌙 다크 모드</button>
+                <input type="text" id="searchInput" class="search-input" placeholder="🔍 노트 검색...">
+                <button id="themeToggleBtn" class="btn">🌙</button>
+                <button id="settingsBtn" class="btn" title="AI 설정">⚙️</button>
                 <button id="addNoteBtn" class="btn primary">새 노트 작성</button>
             </div>
         </header>
@@ -27,6 +29,9 @@
             <div id="notesContainer" class="notes-grid">
                 <!-- 노트 목록이 여기에 렌더링됩니다 -->
             </div>
+            <div id="emptyState" class="hidden empty-state">
+                검색 결과가 없습니다.
+            </div>
         </main>
     </div>
 
@@ -36,12 +41,41 @@
             <span class="close-btn" id="closeModalBtn">&times;</span>
             <h2 id="modalTitle"></h2>
             <div id="modalContent" class="modal-body"></div>
+            
+            <!-- AI 응답 영역 -->
+            <div id="aiResponseArea" class="ai-response-area hidden">
+                <div class="ai-header">
+                    <h4>🤖 AI 어시스턴트</h4>
+                    <button id="closeAiBtn" class="btn-text">닫기</button>
+                </div>
+                <div id="aiResponseContent" class="ai-content">응답을 기다리는 중...</div>
+            </div>
+
             <div class="modal-footer">
                 <span id="modalDate"></span>
-                <button id="editFromModalBtn" class="btn primary">수정</button>
+                <div class="modal-buttons">
+                    <button id="aiSummarizeBtn" class="btn ai-btn">✨ 요약</button>
+                    <button id="aiOpinionBtn" class="btn ai-btn">✨ 의견</button>
+                    <button id="editFromModalBtn" class="btn primary">수정</button>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- 설정 모달 (API 키 입력) -->
+    <div id="settingsModal" class="modal hidden">
+        <div class="modal-content modal-small">
+            <span class="close-btn" id="closeSettingsBtn">&times;</span>
+            <h2>⚙️ 환경 설정</h2>
+            <div class="form-group">
+                <label for="apiKeyInput">Google Gemini API 키 (AI 기능용)</label>
+                <input type="password" id="apiKeyInput" placeholder="AI 키를 입력하세요">
+                <small class="help-text">발급: <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a> (무료)</small>
+            </div>
+            <button id="saveSettingsBtn" class="btn success w-100">저장</button>
+        </div>
+    </div>
+
     <script src="app.js"></script>
 </body>
 </html>
