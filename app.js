@@ -302,9 +302,22 @@ document.addEventListener('DOMContentLoaded', () => {
                             m.name.includes("gemini")
                         );
                         if (validModels.length > 0) {
-                            // flash가 들어간 모델 우선 선택, 없으면 첫 번째 유효 모델
-                            const flashModel = validModels.find(m => m.name.includes("flash"));
-                            targetModel = flashModel ? flashModel.name : validModels[0].name;
+                            // 1.5 계열의 가장 안정적인 버전을 최우선으로 찾기
+                            const preferred = ["models/gemini-1.5-flash", "models/gemini-1.5-pro", "models/gemini-1.0-pro"];
+                            let found = null;
+                            for (let i = 0; i < preferred.length; i++) {
+                                if (validModels.some(m => m.name === preferred[i])) {
+                                    found = preferred[i];
+                                    break;
+                                }
+                            }
+                            if (found) {
+                                targetModel = found;
+                            } else {
+                                // 2.5 등 아직 막혀있거나 실험적인 버전을 제외
+                                const safeModels = validModels.filter(m => !m.name.includes("2.5") && !m.name.includes("experimental"));
+                                targetModel = safeModels.length > 0 ? safeModels[0].name : validModels[0].name;
+                            }
                         }
                     }
                 }
